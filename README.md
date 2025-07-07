@@ -1,49 +1,68 @@
 # Budget Tracker Application
- 
 
-A modern budgeting and expense tracking application with intuitive visualizations and financial insights.
+![App Screenshot](./public/screenshot.png) <!-- Add your screenshot file -->
 
-## Features
+A comprehensive personal finance manager with powerful visualization tools for tracking budgets and expenses.
 
-- 📊 Interactive dashboard with charts and metrics
-- 💰 Budget creation and management
-- 🛒 Transaction tracking and categorization
-- 📈 Monthly spending analysis
-- 🏦 Support for Indian financial systems (UPI, NetBanking)
-- 📱 Mobile-responsive design
+## Key Features
 
-## Technologies Used
+### Dashboard
+- 📊 Real-time spending analytics
+- 📈 Interactive monthly trend charts
+- 💰 Budget vs actual comparison
+- 🏆 Financial health scoring
 
-- **Frontend**: Next.js, React, TypeScript, Tailwind CSS
-- **Data Visualization**: Recharts
-- **Icons**: Lucide React
-- **Styling**: CSS Modules
-- **Build Tool**: Vite (if applicable)
+### Transactions
+- 🛒 Smart transaction categorization
+- 🔍 Advanced search and filtering
+- 📅 Date-range reporting
+- 🧾 Receipt image capture support
+
+### Budgets
+- 🗓️ Flexible budgeting periods
+- 🔔 Overspending alerts
+- 🔄 Recurring budget templates
+- 🎯 Savings goal tracking
+
+## Technology Stack
+
+### Frontend
+| Technology | Purpose |
+|------------|---------|
+| Next.js 14 | App framework |
+| React 18 | UI components |
+| TypeScript | Type safety |
+| Tailwind CSS | Styling |
+| Recharts | Data visualization |
+| Lucide | Icons |
+
+### Backend
+| Technology | Purpose |
+|------------|---------|
+| Node.js | Runtime |
+| MongoDB | Database |
+| Mongoose | ODM |
 
 ## Project Structure
 
-
-
-budget-tracker/
-├── app/
-│ ├── dashboard/ # Dashboard components
-│ │ ├── BudgetChart.tsx
-│ │ ├── CategoryPieChart.tsx
-│ │ ├── MonthlyBarChart.tsx
-│ │ └── SummaryCard.tsx
-│ ├── transaction/ # Transaction management
-│ │ ├── Transaction.tsx
-│ │ └── TransactionForm.tsx
-│ └── (other pages)
+```text
+yardStick/
+├── app/ 
+│   ├── dashboard/           # Dashboard pages
+│   │   ├── analytics/       # Analytics subpages
+│   │   └── page.tsx         # Main dashboard
+│   ├── transactions/        # Transaction management
+│   ├── budgets/             # Budget management
+│   └── api/                 # API routes
 ├── components/
-│ ├── ui/ # UI components
-│ │ ├── button.tsx
-│ │ ├── card.tsx
-│ │ └── ...
-│ └── (other components)
-├── public/ # Static assets
-├── styles/ # Global styles
-└── README.md
+│   ├── charts/              # Chart components
+│   ├── forms/               # Form components
+│   └── ui/                  # UI primitives
+├── lib/                     # Utility functions
+├── public/                  # Static assets
+├── styles/                  # Global styles
+└── types/                   # Type definitions
+```
 
 
 
@@ -56,42 +75,42 @@ budget-tracker/
 - Git (optional)
 
 ### Installation
-
-1. Clone the repository:
+ 
    ```bash
-   git clone https://github.com/yourusername/budget-tracker.git 
-```
-2. Install dependencies:
-    ```bash
-    npm install
-    # or
-    yarn install
-``` 
-3. Start the development server:
-    ```bash
-    npm run dev     
-    # or
-    yarn dev
+   # Clone repository
+git clone https://github.com/nitingupta95/yardStick.git
+cd yardStick
 
-4. Open your web browser and navigate to `http://localhost:3000`
+# Install dependencies
+npm install
 
-```
+# Set up environment variables
+cp .env.example .env.local
+
+# running the application
+npm run dev
+ 
 ```
 ## Configuration
-Create a .env.local file in the root directory with your environment variables:
+Edit .env.local with your settings:
+
     ```bash
     MONGODB_URI=your_mongodb_connection_string 
 ```
+
+
 ## Contributing
-Fork the project
+We welcome contributions! Please follow these steps:
 
-Create your feature branch (git checkout -b feature/AmazingFeature)
+Fork the repository
 
-Commit your changes (git commit -m 'Add some amazing feature')
+Create a feature branch
 
-Push to the branch (git push origin feature/AmazingFeature)
+Commit your changes
 
-Open a Pull Request
+Push to the branch
+
+Open a pull request
 
 ## License
 Distributed under the MIT License. See LICENSE for more information.

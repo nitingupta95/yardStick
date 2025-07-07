@@ -91,7 +91,7 @@ cp .env.example .env.local
 npm run dev
  
 ```
-## Configuration
+### Configuration
 Edit .env.local with your settings:
 
     ```bash

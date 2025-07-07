@@ -72,11 +72,10 @@ budget-tracker/
     npm run dev     
     # or
     yarn dev
+
+4. Open your web browser and navigate to `http://localhost:3000`
+
 ```
-4. Open your web brows
-er and navigate to [http://localhost:3000](http://localhost:3000)
-
-
 
 ## Configuration
 Create a .env.local file in the root directory with your environment variables:

@@ -92,13 +92,12 @@ npm run dev
  
 ```
 ### Configuration
-Edit .env.local with your settings:
 
-    ```bash
-    MONGODB_URI=your_mongodb_connection_string 
-```
+Edit `.env.local` with your settings:
 
-``
+```env
+MONGODB_URI=your_mongodb_connection_string
+
 
 ## Contributing to the project
 We welcome contributions! Please follow these steps:

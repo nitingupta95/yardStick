@@ -71,7 +71,8 @@ budget-tracker/
     ```bash
     npm run dev     
     # or
-yarn dev```
+    yarn dev
+```
 4. Open your web brows
 er and navigate to [http://localhost:3000](http://localhost:3000)
 
@@ -81,7 +82,7 @@ er and navigate to [http://localhost:3000](http://localhost:3000)
 Create a .env.local file in the root directory with your environment variables:
     ```bash
     MONGODB_URI=your_mongodb_connection_string 
-    ```
+```
 ## Contributing
 Fork the project
 

@@ -76,7 +76,7 @@ budget-tracker/
 4. Open your web browser and navigate to `http://localhost:3000`
 
 ```
-
+```
 ## Configuration
 Create a .env.local file in the root directory with your environment variables:
     ```bash

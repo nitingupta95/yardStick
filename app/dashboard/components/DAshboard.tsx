@@ -34,63 +34,51 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
   const [budgetData, setbudgetdata] = useState<BudgetSummary[]>([]);
 
   const totalExpenses = transactions.reduce((sum, t) => sum + t.amount, 0);
-  const monthlyExpenses = transactions
-    .filter(t => new Date(t.date).getMonth() === new Date().getMonth())
-    .reduce((sum, t) => sum + t.amount, 0);
-
   const avgTransaction = transactions.length > 0 ? totalExpenses / transactions.length : 0;
   const transactionCount = transactions.length;
 
-
-
-  const bdata = async () => {
-    const res = await axios.get("/api/budget");
-    const monthMap = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    
-    // First group transactions by month
-    const transactionsByMonth: Record<number, TransactionFormData[]> = {};
-    transactions.forEach(t => {
-      const month = new Date(t.date).getMonth();
-      if (!transactionsByMonth[month]) {
-        transactionsByMonth[month] = [];
-      }
-      transactionsByMonth[month].push(t);
-    });
-
-    const summary: BudgetSummary[] = [];
-
-    // Process each month
-    monthMap.forEach((monthName, monthIndex) => {
-      const monthBudgets = res.data.filter((b: { startDate: string | number | Date; }) :any => {
-        const budgetMonth = new Date(b.startDate).getMonth();
-        return budgetMonth === monthIndex;
-      });
-
-      if (monthBudgets.length > 0) {
-        const totalBudget = monthBudgets.reduce((sum: any, b: { amount: any; }) => sum + b.amount, 0);
-        const totalSpent = transactionsByMonth[monthIndex]?.reduce((sum, t) => sum + t.amount, 0) || 0;
-        const totalRemaining = totalBudget - totalSpent;
-
-        summary.push({
-          month: monthName,
-          budget: totalBudget,
-          spent: totalSpent,
-          remaining: totalRemaining > 0 ? totalRemaining : 0
-        });
-      }
-    });
-
-    return summary;
-  };
-  
-
   useEffect(() => {
     const fetchData = async () => {
-      const data = await bdata();
-      setbudgetdata(data);
+      const res = await axios.get("/api/budget");
+
+      const monthMap = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+      const transactionsByMonth: Record<number, TransactionFormData[]> = {};
+      transactions.forEach(t => {
+        const month = new Date(t.date).getMonth();
+        if (!transactionsByMonth[month]) {
+          transactionsByMonth[month] = [];
+        }
+        transactionsByMonth[month].push(t);
+      });
+
+      const summary: BudgetSummary[] = [];
+
+      monthMap.forEach((monthName, monthIndex) => {
+        const monthBudgets = res.data.filter((b: { startDate: string }) => {
+          const budgetMonth = new Date(b.startDate).getMonth();
+          return budgetMonth === monthIndex;
+        });
+
+        if (monthBudgets.length > 0) {
+          const totalBudget = monthBudgets.reduce((sum: number, b: { amount: number }) => sum + b.amount, 0);
+          const totalSpent = transactionsByMonth[monthIndex]?.reduce((sum, t) => sum + t.amount, 0) || 0;
+          const totalRemaining = totalBudget - totalSpent;
+
+          summary.push({
+            month: monthName,
+            budget: totalBudget,
+            spent: totalSpent,
+            remaining: totalRemaining > 0 ? totalRemaining : 0
+          });
+        }
+      });
+
+      setbudgetdata(summary);
     };
+
     fetchData();
-  }, [transactions]);  
+  }, [transactions]);
 
   const currentMonth = new Date().toLocaleString('default', { month: 'short' });
   const currentBudget = budgetData.find(b => b.month === currentMonth);
@@ -127,7 +115,6 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
     };
   });
 
-
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !selectedCategory || transaction.category === selectedCategory;
@@ -147,6 +134,8 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
   });
 
   const categories = [...new Set(transactions.map(t => t.category).filter(Boolean))];
+
+ 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-6">

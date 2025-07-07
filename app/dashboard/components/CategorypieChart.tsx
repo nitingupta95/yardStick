@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, PieLabelRenderProps } from 'recharts';
 import { PieChart as PieChartIcon } from 'lucide-react';
 
 interface CategoryData {
@@ -12,6 +12,21 @@ interface CategoryPieChartProps {
   data: CategoryData[];
 }
 
+interface TooltipPayload {
+  name: string;
+  value: number;
+  payload: CategoryData;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayload[];
+}
+
+interface CustomLabelProps extends PieLabelRenderProps {
+  percent: number;
+}
+
 const COLORS = [
   '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
   '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
@@ -20,7 +35,7 @@ const COLORS = [
 const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0];
       const percentage = ((data.value / total) * 100).toFixed(1);
@@ -36,7 +51,14 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
     return null;
   };
 
-  const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+  const CustomLabel: React.FC<CustomLabelProps> = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent
+  }) => {
     if (percent < 0.05) return null; // Don't show labels for slices less than 5%
     
     const RADIAN = Math.PI / 180;

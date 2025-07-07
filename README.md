@@ -1,6 +1,5 @@
 # Budget Tracker Application
 
-![App Screenshot](./public/screenshot.png) <!-- Add your screenshot file -->
 
 A comprehensive personal finance manager with powerful visualization tools for tracking budgets and expenses.
 

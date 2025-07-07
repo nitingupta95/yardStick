@@ -1,6 +1,6 @@
 "use client"
-import React, { useState, useEffect } from 'react';
-import { DollarSign, Calendar, Tag, Clock, Save, X, AlertCircle, IndianRupee } from 'lucide-react';
+import React, { useState } from 'react';
+import {  Calendar, Tag, Clock, Save, X, AlertCircle, IndianRupee } from 'lucide-react';
 import { Budget, BudgetFormData, BUDGET_CATEGORIES, BUDGET_PERIODS } from "../types/budget";
 
 interface BudgetFormProps {

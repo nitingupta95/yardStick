@@ -4,7 +4,7 @@ import Dashboard from './components/DAshboard'
 import { TransactionFormData } from '@/types/transaction';
 import axios from "axios";
 
-const page = () => {
+const Page = () => {
   const [transactions, setTransactions] = useState<TransactionFormData[]>([]);
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -26,4 +26,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

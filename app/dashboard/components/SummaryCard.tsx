@@ -1,5 +1,5 @@
 import React from 'react';
-import { DivideIcon , TrendingUp, TrendingDown } from 'lucide-react';
+import {  TrendingUp, TrendingDown } from 'lucide-react';
 
 import { LucideIcon } from 'lucide-react'; // or use React.ComponentType if using other icons
 

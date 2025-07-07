@@ -1,26 +1,22 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from 'react';
 import { Plus, Target, TrendingUp, AlertCircle, Search, Filter } from 'lucide-react';
 import { Budget, BudgetFormData } from "../../types/budget";
 import BudgetForm from "../../components/budegtform";
 import BudgetCard from "../../components/budegtCard";
-import { TransactionFormData } from "../../types/transaction";
 import axios from "axios";
 
-interface BudgetPageProps {
-  transactions?: TransactionFormData[];
-}
-
-const BudgetPage: React.FC<BudgetPageProps> = ({ transactions = [] }) => {
+// ✅ Removed unused prop
+const BudgetPage: React.FC = () => {
   const [budgets, setBudgets] = useState<Budget[]>([]);
-
   const [showForm, setShowForm] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterPeriod, setFilterPeriod] = useState('all');
 
- 
+  // (rest of your component remains unchanged)
+
   const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
   const totalSpent = budgets.reduce((sum, budget) => sum + (budget.spent || 0), 0);
   const totalRemaining = totalBudget - totalSpent;
@@ -49,14 +45,14 @@ useEffect(() => {
   const handleCreateBudget = async (budgetData: BudgetFormData) => {
     setIsLoading(true);
     
-    const newBudget: Budget = {
-      _id: Date.now().toString(),
-      ...budgetData,
-      spent: 0,
-      remaining: budgetData.amount,
-      isActive: true,
-      createdAt: new Date().toISOString(),
-    };
+    // const newBudget: Budget = {
+    //   _id: Date.now().toString(),
+    //   ...budgetData,
+    //   spent: 0,
+    //   remaining: budgetData.amount,
+    //   isActive: true,
+    //   createdAt: new Date().toISOString(),
+    // };
      
     const res= await axios.post("/api/budget",budgetData);
       if (res.status === 201) {
@@ -220,7 +216,7 @@ useEffect(() => {
               </div>
               <div>
                 <h3 className="text-gray-600 text-sm font-medium">Over Budget</h3>
-                <div className="text-2xl font-bold text-gray-900">	₹{overBudgetCount}</div>
+                <div className="text-2xl font-bold text-gray-900">{overBudgetCount}</div>
               </div>
             </div>
           </div>

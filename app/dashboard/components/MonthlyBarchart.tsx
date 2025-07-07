@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps } from 'recharts';
 import { BarChart3, TrendingUp, TrendingDown, IndianRupee } from 'lucide-react';
 
 interface MonthlyData {
@@ -14,33 +14,46 @@ interface MonthlyBarChartProps {
   data: MonthlyData[];
 }
 
+interface CustomTooltipProps extends TooltipProps<number, string> {
+  payload?: {
+    name: string;
+    value: number;
+    payload: MonthlyData;
+    color: string;
+  }[];
+  label?: string;
+}
+
+interface TickProps {
+  x: number;
+  y: number;
+  payload: {
+    value: number;
+  };
+}
+
 const MonthlyBarChart: React.FC<MonthlyBarChartProps> = ({ data = [] }) => {
-  // Get current month name (e.g., "Jul")
   const monthMap = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const currentMonthName = new Date().toLocaleString('default', { month: 'short' });
   
-  // Find current month data (instead of just taking last item)
   const currentMonth = data.find(item => item.month === currentMonthName) || 
-                      (data.length > 0 ? data[data.length - 1] : null);
+                     (data.length > 0 ? data[data.length - 1] : null);
 
-  // Find previous month data
   const currentMonthIndex = monthMap.indexOf(currentMonth?.month || '');
   const previousMonthName = currentMonthIndex > 0 ? monthMap[currentMonthIndex - 1] : '';
   const previousMonth = previousMonthName ? data.find(item => item.month === previousMonthName) : null;
 
-  // Calculate net change
   const netChange = currentMonth && previousMonth 
     ? currentMonth.net - previousMonth.net 
     : 0;
   const isPositiveChange = netChange >= 0;
 
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-4 rounded-lg shadow-lg border">
           <p className="font-semibold text-gray-900 mb-2">{label}</p>
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry, index) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: <span className="flex items-center gap-1">
                 <IndianRupee className="w-3 h-3" />
@@ -54,8 +67,7 @@ const MonthlyBarChart: React.FC<MonthlyBarChartProps> = ({ data = [] }) => {
     return null;
   };
 
-  // Custom tick formatter for YAxis
-  const renderCurrencyTick = ({ x, y, payload }: any) => {
+  const renderCurrencyTick: React.FC<TickProps> = ({ x, y, payload }) => {
     return (
       <g transform={`translate(${x},${y})`}>
         <text x={0} y={0} dy={4} textAnchor="end" fill="#666" fontSize={12}>
@@ -70,6 +82,7 @@ const MonthlyBarChart: React.FC<MonthlyBarChartProps> = ({ data = [] }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6">
+      {/* Header section remains the same */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="bg-gradient-to-r from-blue-500 to-cyan-600 p-2 rounded-lg">
@@ -99,6 +112,7 @@ const MonthlyBarChart: React.FC<MonthlyBarChartProps> = ({ data = [] }) => {
         </div>
       </div>
 
+      {/* Chart section remains the same */}
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -134,7 +148,8 @@ const MonthlyBarChart: React.FC<MonthlyBarChartProps> = ({ data = [] }) => {
         </ResponsiveContainer>
       </div>
 
-       <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-100">
+      {/* Summary section remains the same */}
+      <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-100">
         <div className="text-center">
           <div className="text-2xl font-bold text-green-600 flex items-center justify-center gap-1">
             <IndianRupee className="w-4 h-4" />
@@ -154,7 +169,6 @@ const MonthlyBarChart: React.FC<MonthlyBarChartProps> = ({ data = [] }) => {
             (currentMonth?.net ?? 0) >= 0 ? 'text-green-600' : 'text-red-600'
           }`}>
             {(currentMonth?.net ?? 0) < 0 && <span>-</span>}
-             
             <IndianRupee className="w-4 h-4" />
             {Math.abs(currentMonth?.net ?? 0).toFixed(2)}
           </div>

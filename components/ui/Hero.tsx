@@ -1,13 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import Image from "next/image";
+import React from "react"; 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image"; // ✅ Import Next.js Image
 
 const HeroSection = () => { 
- 
-
   return (
     <section className="pt-40 pb-20 px-4">
       <div className="container mx-auto text-center">
@@ -24,17 +22,17 @@ const HeroSection = () => {
               Get Started
             </Button>
           </Link>
-           
         </div>
+
         <div className="hero-image-wrapper mt-5 md:mt-0">
-          <div   className="hero-image">
-            <img
+          <div className="hero-image">
+            <Image
               src="https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg"
               width={1280}
               height={720}
               alt="Dashboard Preview"
               className="rounded-lg shadow-2xl border mx-auto"
-              
+              unoptimized // 🔄 Optional: remove this if you want Next.js to optimize
             />
           </div>
         </div>

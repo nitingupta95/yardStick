@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import { IndianRupee, Calendar, FileText, Tag, Plus, Check, AlertCircle } from 'lucide-react';
-import { Transaction, TransactionFormData, TRANSACTION_CATEGORIES } from '../types/transaction';
+import {  TransactionFormData, TRANSACTION_CATEGORIES } from '../types/transaction';
 
 interface TransactionFormProps {
   onSubmit: (transaction: TransactionFormData) => void;

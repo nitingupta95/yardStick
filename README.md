@@ -98,6 +98,7 @@ Edit .env.local with your settings:
     MONGODB_URI=your_mongodb_connection_string 
 ```
 
+``
 
 ## Contributing to the project
 We welcome contributions! Please follow these steps:

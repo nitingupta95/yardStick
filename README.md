@@ -59,20 +59,16 @@ budget-tracker/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/budget-tracker.git
-   cd budget-tracker
+   git clone https://github.com/yourusername/budget-tracker.git 
 ```
 2. Install dependencies:
-``` 
-npm install
-# or
-yarn install
-
+    ``` npm install
+    # or
+    yarn install
 ``` 
 3. Start the development server:
-```
-npm run dev
-# or
+    ```npm run dev     
+    # or
 yarn dev```
 4. Open your web browser and navigate to [http://localhost:3000](http://localhost:3000)
 
@@ -80,8 +76,8 @@ yarn dev```
 
 ## Configuration
 Create a .env.local file in the root directory with your environment variables:
-`` MONGODB_URI=
-``
+    ``` MONGODB_URI=
+    ```
 ## Contributing
 Fork the project
 
@@ -97,6 +93,6 @@ Open a Pull Request
 Distributed under the MIT License. See LICENSE for more information.
 
 ## Contact
-Your Name - @yourtwitter - your.email@example.com
+Nitin Gupta - @nitingupta95 - ng61315@gmail.com
 
 ## Project Link: https://github.com/nitingupta95/yardStick

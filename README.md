@@ -62,21 +62,25 @@ budget-tracker/
    git clone https://github.com/yourusername/budget-tracker.git 
 ```
 2. Install dependencies:
-    ``` npm install
+    ```bash
+    npm install
     # or
     yarn install
 ``` 
 3. Start the development server:
-    ```npm run dev     
+    ```bash
+    npm run dev     
     # or
 yarn dev```
-4. Open your web browser and navigate to [http://localhost:3000](http://localhost:3000)
+4. Open your web brows
+er and navigate to [http://localhost:3000](http://localhost:3000)
 
 
 
 ## Configuration
 Create a .env.local file in the root directory with your environment variables:
-    ``` MONGODB_URI=
+    ```bash
+    MONGODB_URI=your_mongodb_connection_string 
     ```
 ## Contributing
 Fork the project

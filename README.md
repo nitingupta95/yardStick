@@ -99,7 +99,7 @@ Edit .env.local with your settings:
 ```
 
 
-## Contributing
+## Contributing to the project
 We welcome contributions! Please follow these steps:
 
 Fork the repository

@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Budget Tracker Application
+ 
+
+A modern budgeting and expense tracking application with intuitive visualizations and financial insights.
+
+## Features
+
+- 📊 Interactive dashboard with charts and metrics
+- 💰 Budget creation and management
+- 🛒 Transaction tracking and categorization
+- 📈 Monthly spending analysis
+- 🏦 Support for Indian financial systems (UPI, NetBanking)
+- 📱 Mobile-responsive design
+
+## Technologies Used
+
+- **Frontend**: Next.js, React, TypeScript, Tailwind CSS
+- **Data Visualization**: Recharts
+- **Icons**: Lucide React
+- **Styling**: CSS Modules
+- **Build Tool**: Vite (if applicable)
+
+## Project Structure
+
+
+
+budget-tracker/
+├── app/
+│ ├── dashboard/ # Dashboard components
+│ │ ├── BudgetChart.tsx
+│ │ ├── CategoryPieChart.tsx
+│ │ ├── MonthlyBarChart.tsx
+│ │ └── SummaryCard.tsx
+│ ├── transaction/ # Transaction management
+│ │ ├── Transaction.tsx
+│ │ └── TransactionForm.tsx
+│ └── (other pages)
+├── components/
+│ ├── ui/ # UI components
+│ │ ├── button.tsx
+│ │ ├── card.tsx
+│ │ └── ...
+│ └── (other components)
+├── public/ # Static assets
+├── styles/ # Global styles
+└── README.md
+
+
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
+- Node.js (v18 or higher)
+- npm (v9 or higher) or yarn
+- Git (optional)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/budget-tracker.git
+   cd budget-tracker
+```
+2. Install dependencies:
+``` 
+npm install
+# or
+yarn install
+
+``` 
+3. Start the development server:
+```
 npm run dev
 # or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+yarn dev```
+4. Open your web browser and navigate to [http://localhost:3000](http://localhost:3000)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Configuration
+Create a .env.local file in the root directory with your environment variables:
+`` MONGODB_URI=
+``
+## Contributing
+Fork the project
 
-## Learn More
+Create your feature branch (git checkout -b feature/AmazingFeature)
 
-To learn more about Next.js, take a look at the following resources:
+Commit your changes (git commit -m 'Add some amazing feature')
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Push to the branch (git push origin feature/AmazingFeature)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open a Pull Request
 
-## Deploy on Vercel
+## License
+Distributed under the MIT License. See LICENSE for more information.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contact
+Your Name - @yourtwitter - your.email@example.com
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Link: https://github.com/nitingupta95/yardStick

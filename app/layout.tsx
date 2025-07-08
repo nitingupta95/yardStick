@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Welth",
+  title: "Finance tracker",
   description: "One stop Finance Platform",
 };
 

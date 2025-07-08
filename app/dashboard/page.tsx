@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react'
-import Dashboard from './components/DAshboard'
+import Dashboard from "./components/Dash"
 import { TransactionFormData } from '@/types/transaction';
 import axios from "axios";
 

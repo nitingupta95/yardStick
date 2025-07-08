@@ -1,5 +1,14 @@
+'use client';
+
 import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, PieLabelRenderProps } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  PieLabelRenderProps,
+} from 'recharts';
 import { PieChart as PieChartIcon } from 'lucide-react';
 
 interface CategoryData {
@@ -12,73 +21,70 @@ interface CategoryPieChartProps {
   data: CategoryData[];
 }
 
-interface TooltipPayload {
-  name: string;
-  value: number;
-  payload: CategoryData;
-}
-
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: TooltipPayload[];
+  payload?: {
+    name: string;
+    value: number;
+    payload: CategoryData;
+  }[];
 }
 
-interface CustomLabelProps extends PieLabelRenderProps {
-  percent: number;
+// ✅ FIXED: CustomLabel must be a plain function, not React.FC
+function CustomLabel({
+  cx = 0,
+  cy = 0,
+  midAngle = 0,
+  innerRadius = 0,
+  outerRadius = 0,
+  percent = 0,
+}: PieLabelRenderProps & { percent?: number }) {
+  if ((percent ?? 0) < 0.05) return null;
+
+  const RADIAN = Math.PI / 180;
+  const inner = Number(innerRadius);
+  const outer = Number(outerRadius);
+  const radius = inner + (outer - inner) * 0.5;
+  const x = Number(cx) + radius * Math.cos(-midAngle * RADIAN);
+  const y = Number(cy) + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor={x > Number(cx) ? 'start' : 'end'}
+      dominantBaseline="central"
+      fontSize={12}
+      fontWeight="bold"
+    >
+      {`${((percent ?? 0) * 100).toFixed(0)}%`}
+    </text>
+  );
 }
 
 const COLORS = [
   '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
-  '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
+  '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1',
 ];
 
 const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0];
-      const percentage = ((data.value / total) * 100).toFixed(1);
+    if (active && payload && payload.length > 0) {
+      const item = payload[0];
+      const percentage = ((item.value / total) * 100).toFixed(1);
       return (
         <div className="bg-white p-3 rounded-lg shadow-lg border">
-          <p className="font-semibold text-gray-900">{data.name}</p>
+          <p className="font-semibold text-gray-900">{item.name}</p>
           <p className="text-sm text-gray-600">
-            ₹{data.value.toFixed(2)} ({percentage}%)
+            ₹{item.value.toFixed(2)} ({percentage}%)
           </p>
         </div>
       );
     }
     return null;
-  };
-
-  const CustomLabel: React.FC<CustomLabelProps> = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent
-  }) => {
-    if (percent < 0.05) return null; // Don't show labels for slices less than 5%
-    
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
-        dominantBaseline="central"
-        fontSize={12}
-        fontWeight="bold"
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
   };
 
   return (
@@ -107,7 +113,10 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
               dataKey="value"
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
@@ -119,8 +128,8 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
         <div className="grid grid-cols-2 gap-3">
           {data.slice(0, 6).map((item, index) => (
             <div key={item.name} className="flex items-center gap-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
+              <div
+                className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: COLORS[index % COLORS.length] }}
               />
               <span className="text-sm text-gray-700 truncate flex-1">{item.name}</span>

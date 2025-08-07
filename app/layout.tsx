@@ -4,12 +4,7 @@ import Header from "../components/ui/header";
 import { Toaster } from "../components/ui/sonner";
 import type { ReactNode } from "react";
 import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
+  ClerkProvider
 } from '@clerk/nextjs'
 
 const inter = Inter({ subsets: ["latin"] });

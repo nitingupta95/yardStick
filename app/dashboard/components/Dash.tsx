@@ -10,7 +10,6 @@ import {
   TrendingUp,
   CreditCard,
   PiggyBank,
-  Calendar,
   Download,
   Search
 } from 'lucide-react';
@@ -28,8 +27,7 @@ declare module 'jspdf' {
 }
 
 interface DashboardProps {
-  transactions?: TransactionFormData[];
-  userName?: string;
+  transactions?: TransactionFormData[]; 
 }
 
 type BudgetSummary = {
@@ -42,8 +40,8 @@ type BudgetSummary = {
 
 
  
-const Dashboard: React.FC<DashboardProps> = ({ transactions = [], userName = "User" }) => {
-  const { user, isLoaded } = useUser();
+const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
+  const { user } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [dateRange, setDateRange] = useState('all');
@@ -210,7 +208,8 @@ const handleExport = () => {
     },
     margin: { left: 14, right: 14 },
   });
-    currentY = (doc as any).lastAutoTable.finalY + 12;
+    currentY = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 12;
+
 
 
   // Monthly Budget Overview (Improved)
@@ -248,7 +247,8 @@ const handleExport = () => {
     },
     margin: { left: 14, right: 14 },
   });
-  currentY = (doc as any).lastAutoTable.finalY + 14;
+  currentY = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 14;
+
 
 
   // Transaction History

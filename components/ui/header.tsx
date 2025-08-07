@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "./button";
 import { PenBox, LayoutDashboard, IndianRupee } from "lucide-react";
 import Link from "next/link";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -13,13 +14,11 @@ const Header = () => {
     if (typeof window === "undefined") return;
 
     if (window.location.pathname === "/") {
-      // On homepage, scroll to section
       const element = document.getElementById(section);
       if (element) {
         element.scrollIntoView({ behavior: "smooth" });
       }
     } else {
-      // Navigate to home first then scroll
       router.push(`/#${section}`);
       setTimeout(() => {
         const element = document.getElementById(section);
@@ -42,41 +41,61 @@ const Header = () => {
         </Link>
 
         <div className="hidden md:flex items-center space-x-8">
-          <button
-            onClick={() => handleNavigation("features")}
-            className="text-gray-600 hover:text-blue-600"
-          >
-            Features
-          </button>
-          <button
-            onClick={() => handleNavigation("testimonials")}
-            className="text-gray-600 hover:text-blue-600"
-          >
-            Testimonials
-          </button>
+          <SignedOut>
+            <button
+              onClick={() => handleNavigation("features")}
+              className="text-gray-600 hover:text-blue-600"
+            >
+              Features
+            </button>
+            <button
+              onClick={() => handleNavigation("testimonials")}
+              className="text-gray-600 hover:text-blue-600"
+            >
+              Testimonials
+            </button>
+          </SignedOut>
         </div>
 
         <div className="flex items-center space-x-4">
-          <Link href="/budget">
-            <Button variant="outline">
-              <IndianRupee size={18} />
-              <span className="hidden md:inline">Budget</span>
-            </Button>
-          </Link>
+          <SignedIn>
+            <Link href="/budget">
+              <Button variant="outline">
+                <IndianRupee size={18} />
+                <span className="hidden md:inline">Budget</span>
+              </Button>
+            </Link>
 
-          <Link href="/dashboard">
-            <Button variant="outline">
-              <LayoutDashboard size={18} />
-              <span className="hidden md:inline">Dashboard</span>
-            </Button>
-          </Link>
+            <Link href="/dashboard">
+              <Button variant="outline">
+                <LayoutDashboard size={18} />
+                <span className="hidden md:inline">Dashboard</span>
+              </Button>
+            </Link>
 
-          <Link href="/transaction">
-            <Button className="flex items-center gap-2">
-              <PenBox size={18} />
-              <span className="hidden md:inline">Add Transaction</span>
-            </Button>
-          </Link>
+            <Link href="/transaction">
+              <Button className="flex items-center gap-2">
+                <PenBox size={18} />
+                <span className="hidden md:inline">Add Transaction</span>
+              </Button>
+            </Link>
+          </SignedIn>
+
+          <SignedOut>
+            <SignInButton forceRedirectUrl="/dashboard">
+              <Button variant="outline">Login</Button>
+            </SignInButton>
+          </SignedOut>
+
+          <SignedIn>
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "w-10 h-10",
+                },
+              }}
+            />
+          </SignedIn>
         </div>
       </nav>
     </header>

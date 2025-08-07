@@ -1,4 +1,4 @@
-import  { Schema, Document, models, model } from "mongoose";
+import { Schema, Document, models, model } from "mongoose";
 
 export interface IBudget extends Document {
   category: string;
@@ -9,6 +9,7 @@ export interface IBudget extends Document {
   spent: number;
   remaining: number;
   isActive: boolean;
+  userId: string;  
   createdAt?: string;
   updatedAt?: string;
 }
@@ -24,11 +25,11 @@ const BudgetSchema = new Schema<IBudget>(
     remaining: {
       type: Number,
       default: function (this: IBudget) {
-        // This works in TypeScript when `this` is typed explicitly
         return this.amount;
       },
     },
     isActive: { type: Boolean, default: true },
+    userId: { type: String, required: true },
   },
   {
     timestamps: true,

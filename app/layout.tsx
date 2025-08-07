@@ -3,6 +3,14 @@ import "./globals.css";
 import Header from "../components/ui/header"; 
 import { Toaster } from "../components/ui/sonner";
 import type { ReactNode } from "react";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,12 +25,15 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return ( 
+    <ClerkProvider>
+
     <html lang="en">
       <head>
         <link rel="icon" href="/logo-sm.png" sizes="any" />
       </head>
       <body className={inter.className}>
         <Header />
+
         <main className="min-h-screen">{children}</main>
         <Toaster richColors />
 
@@ -33,5 +44,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
         </footer>
       </body>
     </html>
+     </ClerkProvider>
   );
 }

@@ -1,11 +1,10 @@
 "use client";
+
 import React, { useEffect, useState } from 'react';
-import { TransactionFormData } from '../../../types/transaction';
-import BudgetChart from './BudgetChart';
-import CategoryPieChart from './CategorypieChart';
-import MonthlyBarChart from './MonthlyBarchart';
-import SummaryCard from './SummaryCard';
 import axios from "axios";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { useUser } from "@clerk/nextjs";
 import {
   IndianRupee,
   TrendingUp,
@@ -16,8 +15,21 @@ import {
   Search
 } from 'lucide-react';
 
+import BudgetChart from './BudgetChart';
+import CategoryPieChart from './CategorypieChart';
+import MonthlyBarChart from './MonthlyBarchart';
+import SummaryCard from './SummaryCard';
+import { TransactionFormData } from '../../../types/transaction';
+
+declare module 'jspdf' {
+  interface jsPDF {
+    previousAutoTable?: { finalY?: number };
+  }
+}
+
 interface DashboardProps {
   transactions?: TransactionFormData[];
+  userName?: string;
 }
 
 type BudgetSummary = {
@@ -27,28 +39,30 @@ type BudgetSummary = {
   remaining: number;
 };
 
-const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
+
+
+ 
+const Dashboard: React.FC<DashboardProps> = ({ transactions = [], userName = "User" }) => {
+  const { user, isLoaded } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [dateRange, setDateRange] = useState('all');
-  const [budgetData, setbudgetdata] = useState<BudgetSummary[]>([]);
+  const [budgetData, setBudgetData] = useState<BudgetSummary[]>([]);
 
   const totalExpenses = transactions.reduce((sum, t) => sum + t.amount, 0);
   const avgTransaction = transactions.length > 0 ? totalExpenses / transactions.length : 0;
   const transactionCount = transactions.length;
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchBudgetData = async () => {
       const res = await axios.get("/api/budget");
 
       const monthMap = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
       const transactionsByMonth: Record<number, TransactionFormData[]> = {};
+
       transactions.forEach(t => {
         const month = new Date(t.date).getMonth();
-        if (!transactionsByMonth[month]) {
-          transactionsByMonth[month] = [];
-        }
+        transactionsByMonth[month] = transactionsByMonth[month] || [];
         transactionsByMonth[month].push(t);
       });
 
@@ -56,28 +70,25 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
 
       monthMap.forEach((monthName, monthIndex) => {
         const monthBudgets = res.data.filter((b: { startDate: string }) => {
-          const budgetMonth = new Date(b.startDate).getMonth();
-          return budgetMonth === monthIndex;
+          return new Date(b.startDate).getMonth() === monthIndex;
         });
 
         if (monthBudgets.length > 0) {
           const totalBudget = monthBudgets.reduce((sum: number, b: { amount: number }) => sum + b.amount, 0);
           const totalSpent = transactionsByMonth[monthIndex]?.reduce((sum, t) => sum + t.amount, 0) || 0;
-          const totalRemaining = totalBudget - totalSpent;
-
           summary.push({
             month: monthName,
             budget: totalBudget,
             spent: totalSpent,
-            remaining: totalRemaining > 0 ? totalRemaining : 0
+            remaining: Math.max(totalBudget - totalSpent, 0)
           });
         }
       });
 
-      setbudgetdata(summary);
+      setBudgetData(summary);
     };
 
-    fetchData();
+    fetchBudgetData();
   }, [transactions]);
 
   const currentMonth = new Date().toLocaleString('default', { month: 'short' });
@@ -90,21 +101,17 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
     if (existing) {
       existing.value += transaction.amount;
     } else {
-      acc.push({
-        name: category,
-        value: transaction.amount,
-        color: '#3b82f6'
-      });
+      acc.push({ name: category, value: transaction.amount, color: '#3b82f6' });
     }
     return acc;
   }, [] as Array<{ name: string; value: number; color: string }>);
 
   const monthMap = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
- 
-  const monthlyData = monthMap.map((month, index) => { 
+
+  const monthlyData = monthMap.map((month, index) => {
     const monthExpenses = transactions
       .filter(t => new Date(t.date).getMonth() === index)
-      .reduce((sum, t) => sum + t.amount, 0); 
+      .reduce((sum, t) => sum + t.amount, 0);
     const monthBudget = budgetData.find(b => b.month === month)?.budget ?? 0;
 
     return {
@@ -116,7 +123,7 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
   });
 
   const filteredTransactions = transactions.filter(transaction => {
-    const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = transaction.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !selectedCategory || transaction.category === selectedCategory;
 
     let matchesDate = true;
@@ -135,12 +142,159 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
 
   const categories = [...new Set(transactions.map(t => t.category).filter(Boolean))];
 
- 
+const handleExport = () => {
+  const doc = new jsPDF();
+
+  const formatCurrency = (value: number) => ` ${value.toFixed(2)}`;
+  let currentY = 20;
+
+  // Title
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.text("Personal Finance Report", 14, currentY);
+  currentY += 8;
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Generated for: ${user?.fullName || user?.username || "User"}`, 14, currentY);
+  currentY += 10;
+
+
+  // Divider
+  doc.setDrawColor(200);
+  doc.line(14, currentY, 195, currentY);
+  currentY += 10;
+
+  // Summary
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text("Summary", 14, currentY);
+  currentY += 8;
+
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  const summaryLines = [
+    `Total Expenses: ${formatCurrency(totalExpenses)}`,
+    `Monthly Budget: ${formatCurrency(monthlyBudget)}`,
+    `Avg Transaction: ${formatCurrency(avgTransaction)}`,
+    `Total Transactions: ${transactionCount}`
+  ];
+  summaryLines.forEach((line) => {
+    doc.text(line, 14, currentY);
+    currentY += 6;
+  });
+  currentY += 4;
+
+  // Spending by Category
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text("Spending by Category", 14, currentY);
+  currentY += 5;
+  autoTable(doc, {
+    head: [["Category", "Amount"]],
+    body: categoryData.map(c => [c.name, formatCurrency(c.value)]),
+    startY: currentY,
+    theme: 'striped',
+    headStyles: {
+      fillColor: [63, 81, 181],
+      textColor: 255,
+      fontStyle: 'bold'
+    },
+    styles: {
+      fontSize: 10,
+      cellPadding: 4,
+    },
+    columnStyles: {
+      0: { halign: 'left' },
+      1: { halign: 'right' }
+    },
+    margin: { left: 14, right: 14 },
+  });
+    currentY = (doc as any).lastAutoTable.finalY + 12;
+
+
+  // Monthly Budget Overview (Improved)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text("Monthly Budget Overview", 14, currentY);
+  currentY += 5;
+
+  autoTable(doc, {
+    head: [["Month", "Budget", "Spent", "Remaining"]],
+    body: monthlyData.map(m => [
+      m.month,
+      formatCurrency(m.income),
+      formatCurrency(m.expenses),
+      formatCurrency(m.net)
+    ]),
+    startY: currentY,
+    theme: 'striped',
+    headStyles: {
+      fillColor: [0, 150, 136],
+      textColor: 255,
+      fontStyle: 'bold',
+      halign: 'center',
+    },
+    styles: {
+      fontSize: 10,
+      cellPadding: 4,
+      valign: 'middle',
+    },
+    columnStyles: {
+      0: { halign: 'left', cellWidth: 40 },
+      1: { halign: 'right', cellWidth: 40 },
+      2: { halign: 'right', cellWidth: 40 },
+      3: { halign: 'right', cellWidth: 45 },
+    },
+    margin: { left: 14, right: 14 },
+  });
+  currentY = (doc as any).lastAutoTable.finalY + 14;
+
+
+  // Transaction History
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text("Transaction History", 14, currentY);
+  currentY += 5;
+  autoTable(doc, {
+    head: [["Description", "Category", "Date", "Amount"]],
+    body: filteredTransactions.map(t => [
+      t.description,
+      t.category || 'Other',
+      new Date(t.date).toLocaleDateString(),
+      formatCurrency(t.amount),
+    ]),
+    startY: currentY,
+    theme: 'striped',
+    headStyles: {
+      fillColor: [244, 67, 54],
+      textColor: 255,
+      fontStyle: 'bold'
+    },
+    styles: {
+      fontSize: 10,
+      valign: 'middle',
+      cellPadding: 4,
+    },
+    columnStyles: {
+      0: { halign: 'left', cellWidth: 60 },
+      1: { halign: 'left', cellWidth: 40 },
+      2: { halign: 'center', cellWidth: 30 },
+      3: { halign: 'right', cellWidth: 30 }
+    },
+    margin: { left: 14, right: 14 },
+  });
+
+  // Save PDF
+  doc.save(`finance-report-${new Date().toISOString().split('T')[0]}.pdf`);
+};
+
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
-
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -148,58 +302,23 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
             <p className="text-gray-600">Track your spending and manage your budget</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-md hover:shadow-lg transition-all">
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-md hover:shadow-lg transition-all"
+            >
               <Download className="w-4 h-4" />
               Export
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl shadow-md hover:shadow-lg transition-all">
-              <Calendar className="w-4 h-4" />
-              This Month
-            </button>
+ 
           </div>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <SummaryCard
-            title="Total Expenses"
-            value={<div className="flex items-center gap-1"><IndianRupee className="w-4 h-4" />{totalExpenses.toFixed(2)}</div>}
-            change={12.5}
-            changeLabel="vs last month"
-            icon={IndianRupee}
-            color="blue"
-            trend="up"
-          />
-
-          <SummaryCard
-            title="Monthly Budget"
-            value={<div className="flex items-center gap-1"><IndianRupee className="w-4 h-4" />{monthlyBudget.toFixed(2)}</div>}
-            change={-5.2}
-            changeLabel="under budget"
-            icon={PiggyBank}
-            color="green"
-            trend="down"
-          />
-
-          <SummaryCard
-            title="Avg Transaction"
-            value={<div className="flex items-center gap-1"><IndianRupee className="w-4 h-4" />{avgTransaction.toFixed(2)}</div>}
-            change={8.1}
-            changeLabel="vs last month"
-            icon={CreditCard}
-            color="purple"
-            trend="up"
-          />
-
-          <SummaryCard
-            title="Total Transactions"
-            value={transactionCount.toString()}
-            change={15.3}
-            changeLabel="this month"
-            icon={TrendingUp}
-            color="orange"
-            trend="up"
-          />
+          <SummaryCard title="Total Expenses" value={<><IndianRupee className="w-4 h-4" />{totalExpenses.toFixed(2)}</>} change={12.5} changeLabel="vs last month" icon={IndianRupee} color="blue" trend="up" />
+          <SummaryCard title="Monthly Budget" value={<><IndianRupee className="w-4 h-4" />{monthlyBudget.toFixed(2)}</>} change={-5.2} changeLabel="under budget" icon={PiggyBank} color="green" trend="down" />
+          <SummaryCard title="Avg Transaction" value={<><IndianRupee className="w-4 h-4" />{avgTransaction.toFixed(2)}</>} change={8.1} changeLabel="vs last month" icon={CreditCard} color="purple" trend="up" />
+          <SummaryCard title="Total Transactions" value={transactionCount.toString()} change={15.3} changeLabel="this month" icon={TrendingUp} color="orange" trend="up" />
         </div>
 
         {/* Charts */}
@@ -231,21 +350,13 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
                   className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+              <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <option value="">All Categories</option>
                 {categories.map(category => (
                   <option key={category} value={category}>{category}</option>
                 ))}
               </select>
-              <select
-                value={dateRange}
-                onChange={(e) => setDateRange(e.target.value)}
-                className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+              <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <option value="all">All Time</option>
                 <option value="week">Last Week</option>
                 <option value="month">Last Month</option>
@@ -273,10 +384,9 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
                         {transaction.category && ` • ${transaction.category}`}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-gray-900">
-                        <IndianRupee />{transaction.amount.toFixed(2)}
-                      </div>
+                    <div className="text-right text-lg font-bold text-gray-900">
+                      <IndianRupee className="inline w-4 h-4" />
+                      {transaction.amount.toFixed(2)}
                     </div>
                   </div>
                 ))}
@@ -284,7 +394,6 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions = [] }) => {
             )}
           </div>
         </div>
-
       </div>
     </div>
   );
